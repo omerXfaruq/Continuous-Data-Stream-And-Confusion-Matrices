@@ -38,5 +38,5 @@ async def read_csv_by_chunks(
             item_array = chunk.to_numpy()
             if session is not None:
                 create_entry_list_coming_from_csv(item_array, session)
-            else:
+            else: #pragma: no cover
                 create_entry_list_coming_from_csv(item_array)
