@@ -2,11 +2,15 @@
 
 _By FarukOzderim_
 
-# Description
+## Description
 
-This is a continuous learning project from a simulated continuous data source.
+This is a continuous learning from a simulated continuous data source.
 
-# Tests
+## Requirements
+```
+pip3 install -r requirements.txt
+```
+## Tests
 
 ```
 pytest -v --cov=src --cov-report term-missing test/unit.py
