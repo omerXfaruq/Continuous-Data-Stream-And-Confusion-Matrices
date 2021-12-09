@@ -1,1 +1,17 @@
-# Continous-Learning
+# Continuous-Learning
+
+_By FarukOzderim_
+
+## Description
+
+This is a continuous learning from a simulated continuous data source.
+
+## Requirements
+```
+pip3 install -r requirements.txt
+```
+## Tests
+
+```
+pytest -v --cov=src --cov-report term-missing test/unit.py
+```
