@@ -4,10 +4,11 @@ from copy import deepcopy
 pytest_plugins = ("pytest_asyncio",)
 
 import pytest
+
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
 
-from src.db.csv import read_csv_by_chunks
+from src.db.read_csv import read_csv_by_chunks
 from src.db.db import (
     create_db_and_tables,
     create_entry,
@@ -71,8 +72,3 @@ class TestDb:
         assert entry == entries[0]
         entry.id = 2
         assert entry == entries[1]
-        print(entries)
-
-
-def test_temp(session: Session):
-    pass
