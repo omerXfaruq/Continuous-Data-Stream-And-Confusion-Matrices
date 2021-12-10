@@ -11,6 +11,7 @@ async def read_csv_by_chunks(
     debug: bool = False,
     write_to_db=True,
     session: "Session" = None,
+    caller_main_event: "MainEvent" = None,
 ) -> None:
     """
     Read csv chunk by chunk and write to the database with periodic sleeps.
@@ -36,7 +37,16 @@ async def read_csv_by_chunks(
 
         if write_to_db:
             item_array = chunk.to_numpy()
+
+            # Use given database session, mainly for testing
             if session is not None:
                 create_entry_list_coming_from_csv(item_array, session)
-            else: #pragma: no cover
+            else:  # pragma: no cover
                 create_entry_list_coming_from_csv(item_array)
+
+            if caller_main_event is not None:
+                await caller_main_event.mark_new_data_arrived()
+
+        if caller_main_event is not None:
+            if caller_main_event.stop is True:
+                break
