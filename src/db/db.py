@@ -1,6 +1,11 @@
-from typing import List
+from typing import List, Union
 from sqlmodel import Session, SQLModel, create_engine, select
-from .models import Entry, create_entry_from_array
+from .models import (
+    Entry,
+    create_entry_from_array,
+    ConfusionMatrix,
+    create_confusion_matrix_from_array,
+)
 
 sqlite_file_name = "database.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
@@ -26,18 +31,24 @@ def create_entry(
         session.add(entry)
         session.commit()
         session.refresh(entry)
+        return entry
+
     except Exception as ex:
         raise ex
-    return entry
 
 
 def create_entry_list_coming_from_csv(
-    entry_list: "numpy.ndarray",
+    entry_list: List[List[Union[int, str]]],
     session: Session = next(get_session()),
 ) -> None:
-    for array in entry_list:
-        entry = create_entry_from_array(array)
-        create_entry(entry, session)
+    try:
+        for array in entry_list:
+            entry = create_entry_from_array(array)
+            session.add(entry)
+        session.commit()
+
+    except Exception as ex:
+        raise ex
 
 
 def get_entry_by_id(
@@ -48,12 +59,29 @@ def get_entry_by_id(
     return selected_item
 
 
-def get_all_entries(session: Session = next(get_session())) -> List[Entry]:
+def get_all_entries(
+    start_index: int = 1,
+    end_index: int = 1000,
+    session: Session = next(get_session()),
+) -> List[Entry]:
     try:
-        entries = session.exec(select(Entry)).all()
+        offset = max(0, start_index - 1)
+        number_of_elements = end_index - start_index + 1
+        entries = session.exec(
+            select(Entry).offset(offset).limit(number_of_elements)
+        ).all()
     except Exception as ex:
         raise ex
     return entries
+
+
+def get_entry_count(session: Session = next(get_session())) -> int:
+    try:
+        entry_count = session.query(Entry).count()
+
+    except Exception as ex:
+        raise ex
+    return entry_count
 
 
 def delete_entry_by_id(
@@ -65,5 +93,41 @@ def delete_entry_by_id(
         if entry is not None:
             session.delete(entry)
             session.commit()
+    except Exception as ex:
+        raise ex
+
+
+def write_confusion_matrix_to_db(
+    confusion_matrix: List[List[int]],
+    start_index: int,
+    end_index: int,
+    session: Session = next(get_session()),
+) -> ConfusionMatrix:
+    confusion_matrix = create_confusion_matrix_from_array(
+        confusion_matrix, start_index, end_index
+    )
+
+    try:
+        session.add(confusion_matrix)
+        session.commit()
+        session.refresh(confusion_matrix)
+        return confusion_matrix
+
+    except Exception as ex:
+        raise ex
+
+
+def get_confusion_matrices(
+    start_index: int = 1,
+    end_index: int = 1000,
+    session: Session = next(get_session()),
+) -> List[ConfusionMatrix]:
+    try:
+        offset = max(0, start_index - 1)
+        number_of_elements = end_index - start_index + 1
+        matrices = session.exec(
+            select(ConfusionMatrix).offset(offset).limit(number_of_elements)
+        ).all()
+        return matrices
     except Exception as ex:
         raise ex
