@@ -14,7 +14,8 @@ from .db import (
     write_confusion_matrix_to_db,
     get_session,
     Session,
-    get_confusion_matrices,
+    get_confusion_matrix_count,
+    create_confusion_matrix_from_array,
 )
 
 
@@ -64,8 +65,8 @@ class ContinuousLearning:
         # Run tasks concurrently
 
         self.loop.create_task(self.read_csv_by_chunks())
-        self.loop.create_task(self.calculate_and_write_confusion_matrices())
-        self.loop.run_until_complete(self.countdown_stop())
+        self.loop.create_task(self.countdown_stop())
+        self.loop.run_until_complete(self.calculate_and_write_confusion_matrices())
         self.loop.close()
 
     async def mark_new_data_arrived(self):
@@ -76,10 +77,13 @@ class ContinuousLearning:
         self.stop = True
 
     async def countdown_stop(self) -> None:
-        countdown = max(0, ceil(self.countdown - 10))
-        await asyncio.sleep(countdown)
+        countdown = max(0, ceil(self.countdown - 5))
+        for i in range(int(countdown)):
+            await asyncio.sleep(1)
+            if self.stop:
+                return
         self.close()
-        await asyncio.sleep(10)
+        await asyncio.sleep(5)
 
     async def calculate_and_write_confusion_matrices(
         self,
@@ -108,8 +112,9 @@ class ContinuousLearning:
             else:
                 if self.debug:
                     print(
-                        f"Confusion Matrices:{get_confusion_matrices(session=session)}"
+                        f"No new data is found, confusion Matrix Count:{get_confusion_matrix_count(session=session)}"
                     )
+        await asyncio.sleep(5)
 
     def trigger_confusion_matrix_update(self, session: Session) -> None:
         """
@@ -123,7 +128,9 @@ class ContinuousLearning:
         """
         number_of_entries = get_entry_count(session)
         if self.debug:
-            print(f"trigger_confusion_matrix_update, numberOfEntries: {number_of_entries}, start_index:{self.last_calculated_confusion_matrix_starting_index + 1}")
+            print(
+                f"trigger_confusion_matrix_update, numberOfEntries: {number_of_entries}, start_index:{self.last_calculated_confusion_matrix_starting_index + 1}"
+            )
         if number_of_entries < self.confusion_matrix_length:
             return
 
@@ -134,9 +141,12 @@ class ContinuousLearning:
         entries = get_all_entries(
             start_index=start_index, end_index=end_index, session=session
         )
-
         confusion_matrix = self.calculate_confusion_matrix(entries)
-        write_confusion_matrix_to_db(confusion_matrix, start_index, end_index, session)
+
+        confusion_matrix_orm = create_confusion_matrix_from_array(
+            confusion_matrix, start_index, end_index
+        )
+        confusion_matrix_orm_list = [confusion_matrix_orm]
 
         while end_index < number_of_entries:
             start_index += 1
@@ -146,14 +156,18 @@ class ContinuousLearning:
             entries.append(new_item)
             # There is no need to calculate all the confusion matrices from scratch.
             self.update_confusion_matrix(old_item, new_item, confusion_matrix)
-            written_confusion_matrix = write_confusion_matrix_to_db(
-                confusion_matrix, start_index, end_index, session
-            )
-            if self.debug:
-                print(
-                    f"Wrote the confusion matrix to the db:{written_confusion_matrix}"
+            confusion_matrix_orm_list.append(
+                create_confusion_matrix_from_array(
+                    confusion_matrix, start_index, end_index
                 )
+            )
 
+        write_confusion_matrix_to_db(confusion_matrix_orm_list, session)
+
+        if self.debug:
+            print(
+                f"Wrote the confusion matrices to the db, until start_index:{start_index}, end_index:{end_index}"
+            )
         self.last_calculated_confusion_matrix_starting_index = start_index
 
     @staticmethod
@@ -199,5 +213,9 @@ class ContinuousLearning:
                 if self.debug:
                     print(f"Wrote chunk to the db, iteration_no:{iter_num}")
 
-            if self.stop is True:
-                break
+            if self.stop:
+                return
+
+        # Give 10 seconds for confusion matrix updater to finish the updates, then stop
+        await asyncio.sleep(10 * 1)
+        self.close()

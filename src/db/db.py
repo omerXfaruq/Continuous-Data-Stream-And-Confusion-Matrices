@@ -98,20 +98,13 @@ def delete_entry_by_id(
 
 
 def write_confusion_matrix_to_db(
-    confusion_matrix: List[List[int]],
-    start_index: int,
-    end_index: int,
+    confusion_matrices: List[ConfusionMatrix],
     session: Session = next(get_session()),
-) -> ConfusionMatrix:
-    confusion_matrix = create_confusion_matrix_from_array(
-        confusion_matrix, start_index, end_index
-    )
-
+) -> None:
     try:
-        session.add(confusion_matrix)
+        for confusion_matrix in confusion_matrices:
+            session.add(confusion_matrix)
         session.commit()
-        session.refresh(confusion_matrix)
-        return confusion_matrix
 
     except Exception as ex:
         raise ex
@@ -129,5 +122,14 @@ def get_confusion_matrices(
             select(ConfusionMatrix).offset(offset).limit(number_of_elements)
         ).all()
         return matrices
+    except Exception as ex:
+        raise ex
+
+
+def get_confusion_matrix_count(session: Session = next(get_session())) -> int:
+    try:
+        confusion_matrix_count = session.query(ConfusionMatrix).count()
+        return confusion_matrix_count
+
     except Exception as ex:
         raise ex

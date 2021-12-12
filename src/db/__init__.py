@@ -11,8 +11,9 @@ from .db import (
     Session,
     create_entry_list_coming_from_csv,
     get_confusion_matrices,
+    get_confusion_matrix_count,
 )
-from .models import Entry, ConfusionMatrix
+from .models import Entry, ConfusionMatrix, create_confusion_matrix_from_array
 
 __all__ = [
     "get_entry_by_id",
@@ -29,4 +30,6 @@ __all__ = [
     "Session",
     "create_entry_list_coming_from_csv",
     "get_confusion_matrices",
+    "get_confusion_matrix_count",
+    "create_confusion_matrix_from_array",
 ]
