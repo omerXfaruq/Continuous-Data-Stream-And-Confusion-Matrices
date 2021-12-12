@@ -7,12 +7,13 @@ __all__ = [
 ]
 
 if __name__ == "__main__":
-    if len(argv) != 4:
+    if len(argv) != 5:
         exit("Please provide run as:\npython3 -m src.__init__ [input] [close_after_seconds] [debug]")
 
     input_path = argv[1]
     close_after_seconds = int(argv[2])
-    debug = "True" == argv[3]
+    confusion_matrix_length = int(argv[3])
+    debug = "True" == argv[4]
 
     ContinuousLearning(
         input_path=input_path,
