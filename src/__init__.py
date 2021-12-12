@@ -18,7 +18,7 @@ if __name__ == "__main__":
     ContinuousLearning(
         input_path=input_path,
         close_after_countdown=close_after_seconds,
-        confusion_matrix_length=3,
+        confusion_matrix_length=confusion_matrix_length,
         debug=debug,
     )
 
