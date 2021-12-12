@@ -1,8 +1,0 @@
-copy
-time
-black
-pytest
-asyncio
-sqlmodel
-pandas
-typing

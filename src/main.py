@@ -30,13 +30,17 @@ class ContinuousLearning:
         auto_start: bool = True,
     ) -> "ContinuousLearning":
         """
-        Runs simulated continuous data source and continuous learning concurrently.
+        Runs simulated continuous data source and continuous confusion matrix updates concurrently.
+        Confusion matrices are calculated with moving windows.
 
         Args:
             input_path:
             sleep_between_reads:
             chunk_size:
-            write_to_db:
+            close_after_countdown:
+            confusion_matrix_length:
+            debug:
+            auto_start:
         """
         self.loop = asyncio.get_event_loop()
         self.lock = asyncio.Lock()
@@ -109,7 +113,7 @@ class ContinuousLearning:
 
     def trigger_confusion_matrix_update(self, session: Session) -> None:
         """
-        Calculates new confusion matrices starting from the last calculated point, and writes them to the database.
+        Calculates new confusion matrices with moving windows, starting from the last calculated point, and writes them to the database.
 
         Args:
             session:
