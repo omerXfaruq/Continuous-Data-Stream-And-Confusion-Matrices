@@ -9,7 +9,8 @@ This is a continuous calculation of confusion matrices with a concurrent simulat
 Whenever there is new incoming data, this program calculates the confusion matrices with moving windows and writes them to the database.
 
 ## Requirements
-
+- sqlite
+- requirements.txt
 ```
 pip3 install -r requirements.txt
 ```
