@@ -15,13 +15,20 @@ pip3 install -r requirements.txt
 ## Run
 
 ```
-python3 -m src.__init__ [input] [close_after_seconds]
+rm database.db
+python3 -m src.__init__ [input] [close_after_seconds] [debug]
+```
 
 Examples:
 
-python3 -m src.__init__ test/data/data_small.csv 10
+```
+rm database.db
+python3 -m src.__init__ test/data/data_small.csv 10 True
+```
 
-python3 -m src.__init__ test/data/data.csv 100
+```
+rm database.db
+python3 -m src.__init__ test/data/data.csv 600 False
 ```
 
 ## Tests
@@ -29,3 +36,5 @@ python3 -m src.__init__ test/data/data.csv 100
 ```
 pytest -v --cov=src --cov-report term-missing test/unit.py
 ```
+
+Tests take around 30 seconds
