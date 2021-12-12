@@ -8,6 +8,13 @@ This is a continuous calculation of confusion matrices with a concurrent simulat
 
 Whenever there is new incoming data, this program calculates the confusion matrices with moving windows and writes them to the database.
 
+
+## Run With Docker
+```
+docker build -t py .
+docker run py
+```
+
 ## Requirements
 
 - sqlite
@@ -17,7 +24,8 @@ Whenever there is new incoming data, this program calculates the confusion matri
 pip3 install -r requirements.txt
 ```
 
-## Run
+
+## Run Locally
 
 ```
 rm database.db
