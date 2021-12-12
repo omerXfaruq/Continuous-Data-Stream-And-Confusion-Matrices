@@ -31,7 +31,7 @@ python3 -m src.__init__ test/data/data_small.csv 10 3 True
 
 ```
 rm database.db
-python3 -m src.__init__ test/data/data.csv 600 1000 False
+python3 -m src.__init__ test/data/data.csv 600 3000 False
 ```
 
 ## Tests
