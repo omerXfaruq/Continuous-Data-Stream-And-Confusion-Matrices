@@ -15,6 +15,7 @@ from src.db import (
     get_entry_count,
     delete_entry_by_id,
     get_confusion_matrices,
+    create_entry_list_coming_from_csv,
 )
 from src.main import ContinuousLearning
 
@@ -72,6 +73,18 @@ class TestUnit:
             assert entries[0] == created_entry
             entry.id = 1
             assert entries[0] == entry
+
+        def test_create_entries(self, session: Session):
+            entries = [
+                deepcopy([1, "A", 0.6315429094436551, 0.3684570905563449, 0.9881789935400176, 0.011821006459982408, 0.7254980531654877, 0.27450194683451234, ]),
+                deepcopy([1, "A", 0.6315429094436551, 0.3684570905563449, 0.9881789935400176, 0.011821006459982408, 0.7254980531654877, 0.27450194683451234, ]),
+                deepcopy([1, "A", 0.6315429094436551, 0.3684570905563449, 0.9881789935400176, 0.011821006459982408, 0.7254980531654877, 0.27450194683451234, ]),
+                deepcopy([1, "A", 0.6315429094436551, 0.3684570905563449, 0.9881789935400176, 0.011821006459982408, 0.7254980531654877, 0.27450194683451234, ]),
+            ]
+            create_entry_list_coming_from_csv(entries, session)
+            create_entry_list_coming_from_csv(entries, session)
+            create_entry_list_coming_from_csv(entries, session)
+            assert 12 == len(get_all_entries(session=session))
 
         def test_read_entries(self, session: Session):
             entry = deepcopy(MockData.entry_array_A_A)
@@ -156,19 +169,19 @@ class TestUnit:
             )
             await continuous_learning.read_csv_by_chunks(
                 session=session,
-                write_to_db=True,
+                write_to_db=False,
             )
             time_difference = time.time() - current_time
             assert time_difference >= 1
 
         @pytest.mark.asyncio
         async def test_read_csv_by_chunks_and_write(self, session):
-            data_input = "test/data/data_small.csv"
+            data_input = "test/data/data.csv"
 
             continuous_learning = ContinuousLearning(
                 input_path=data_input,
-                sleep_between_reads=0.1,
-                chunk_size=10000,
+                sleep_between_reads=0.01,
+                chunk_size=300,
                 debug=True,
                 auto_start=False,
             )
@@ -176,8 +189,8 @@ class TestUnit:
                 session=session,
                 write_to_db=True,
             )
-            entries = get_all_entries(session=session)
-            assert len(entries) == 9
+            entries = get_all_entries(session=session, end_index=100000)
+            assert len(entries) == 100000
 
         @pytest.mark.asyncio
         async def test_trigger_confusion_matrix_update(self, session):
@@ -200,4 +213,4 @@ class TestUnit:
 
             continuous_learning.trigger_confusion_matrix_update(session)
 
-            assert len(get_confusion_matrices(session=session)) == 6
+            assert len(get_confusion_matrices(session=session)) == 7

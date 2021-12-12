@@ -123,12 +123,12 @@ class ContinuousLearning:
         """
         number_of_entries = get_entry_count(session)
         if self.debug:
-            print(f"trigger_confusion_matrix_update, numberOfEntries: {number_of_entries}")
+            print(f"trigger_confusion_matrix_update, numberOfEntries: {number_of_entries}, start_index:{self.last_calculated_confusion_matrix_starting_index + 1}")
         if number_of_entries < self.confusion_matrix_length:
             return
 
         start_index = self.last_calculated_confusion_matrix_starting_index + 1
-        index_difference = max(0, self.confusion_matrix_length)
+        index_difference = max(0, self.confusion_matrix_length - 1)
         end_index = start_index + index_difference
 
         entries = get_all_entries(
