@@ -1,10 +1,10 @@
-# Continuous-Data-Source & Confusion-Matrix-Calculation
+# Continuous-Data-Stream & Confusion-Matrix-Calculation
 
 _By FarukOzderim_
 
 ## Description
 
-This is a continuous calculation of confusion matrices with a concurrent simulated continuous data source.
+This is a continuous calculations of confusion matrices with a concurrent simulated continuous data stream.
 
 Whenever there is new incoming data, this program calculates the confusion matrices with moving windows and writes them to the database.
 
