@@ -27,7 +27,7 @@ if __name__ == "__main__":
     if debug:
         print("Entry Count:")
         print(get_entry_count())
-        print("Confusion Matrices:")
+        print("Confusion Matrix Count:")
         print(get_confusion_matrix_count())
 
     print("Closed the Continuous Learning and finished the program!")
