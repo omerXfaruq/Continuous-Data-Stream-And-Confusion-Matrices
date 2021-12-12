@@ -19,19 +19,19 @@ pip3 install -r requirements.txt
 
 ```
 rm database.db
-python3 -m src.__init__ [input] [close_after_seconds] [confusion_matrix_window_length] [debug]
+python3 -m src.__init__ [input] [hard_stop_countdown] [confusion_matrix_window_length] [debug]
 ```
 
 Examples:
 
 ```
 rm database.db
-python3 -m src.__init__ test/data/data_small.csv 10 3 True
+python3 -m src.__init__ test/data/data_small.csv 20 3 True
 ```
 
 ```
 rm database.db
-python3 -m src.__init__ test/data/data.csv 600 3000 False
+python3 -m src.__init__ test/data/data.csv 1800 1000 False
 ```
 
 ## Tests
