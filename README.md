@@ -50,3 +50,4 @@ There are 3  ML models, and each modelX_Y represents probability of model X pred
 We combine ML models' results and predict the label and create confusion matrices with that prediction.
 https://en.wikipedia.org/wiki/Confusion_matrix
 !image[img/confusion_matrix]
+![Confusion Matrix](https://github.com/FarukOzderim/Continous-Learning/blob/master/img/confusion_matrix.png)
